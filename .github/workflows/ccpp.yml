@@ -55,26 +55,17 @@ jobs:
         name: onvif_srvd
         path: dist/onvif_srvd
 
-    - name: Release (dev)
-      if: env.isNightly == 'true'
-      uses: ncipollo/release-action@v1
-      with:
-        prerelease: true
-        tag : dev
-        token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: onvif_srvd
-
     - name: Update dev tag
       if: env.isNightly == 'true'
       uses: ncipollo/release-action@v1
       with:
         allowUpdates: true
-        artifacts: onvif_srvd
-        commit: dev
+        name: dev
         prerelease: true
         replacesArtifacts: true
-        tag : dev
+        tag: dev
         token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: onvif_srvd
 
     # - name: Release (pre-release)
     #   if: env.isReleaseCandidate == 'true'
