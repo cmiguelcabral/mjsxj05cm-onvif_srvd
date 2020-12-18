@@ -7,8 +7,9 @@ on:
     tags:
       - '*'
 env:
+  isNightly: ${{ contains(github.ref, 'dev') }}
   isReleaseCandidate: ${{ contains(github.ref, 'tags') && contains(github.ref, '-rc') }}
-  isFinalRelease: ${{ contains(github.ref, 'tags') && !contains(github.ref, '-rc') }}
+  isFinalRelease: ${{ contains(github.ref, 'tags') && contains(github.ref, '-release') }}
 
 jobs:
   build:
@@ -54,15 +55,27 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: onvif_srvd
-        path: onvif_srvd
+        path: dist/onvif_srvd
 
-    - name: Release (pre-release)
-      if: env.isReleaseCandidate == 'true'
+    - name: Update dev tag
+      if: env.isNightly == 'true'
       uses: ncipollo/release-action@v1
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        prerelease: true
+        allowUpdates: true
         artifacts: onvif_srvd
+        commit: dev
+        draft: true
+        replacesArtifacts: true
+        tag : dev
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    # - name: Release (pre-release)
+    #   if: env.isReleaseCandidate == 'true'
+    #   uses: ncipollo/release-action@v1
+    #   with:
+    #     token: ${{ secrets.GITHUB_TOKEN }}
+    #     prerelease: true
+    #     artifacts: onvif_srvd
         
     - name: Update latest-rc tag
       if: env.isReleaseCandidate == 'true'
@@ -75,12 +88,12 @@ jobs:
         prerelease: true
         artifacts: onvif_srvd
 
-    - name: Release (final)
-      if: env.isFinalRelease == 'true'
-      uses: ncipollo/release-action@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: onvif_srvd
+    # - name: Release (final)
+    #   if: env.isFinalRelease == 'true'
+    #   uses: ncipollo/release-action@v1
+    #   with:
+    #     token: ${{ secrets.GITHUB_TOKEN }}
+    #     artifacts: onvif_srvd
         
     - name: Update latest tag
       if: env.isFinalRelease == 'true'
