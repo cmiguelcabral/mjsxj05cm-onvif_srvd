@@ -4,13 +4,10 @@ on:
   push:
     branches:
       - '*'
-    tags:
-      - '*'
 
 env:
   isNightly: ${{ contains(github.ref, 'dev') }}
-  isReleaseCandidate: ${{ contains(github.ref, 'tags') && contains(github.ref, 'rc-') }}
-  isFinalRelease: ${{ contains(github.ref, 'tags') && contains(github.ref, 'release-') }}
+  isFinalRelease: ${{ contains(github.ref, 'master') }}
 
 jobs:
   build:
@@ -49,56 +46,46 @@ jobs:
     - name: Compile
       run: make clean && make release GCC=output/host/bin/arm-buildroot-linux-uclibcgnueabihf-gcc
 
-    - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v1
-      with:
-        name: onvif_srvd
-        path: dist/onvif_srvd
-
-    - name: Update dev tag
+    - name: Create Release Candidate
       if: env.isNightly == 'true'
-      uses: ncipollo/release-action@v1
+      id: create_release_candidate
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        allowUpdates: true
-        name: dev
+        tag_name: latest-rc
+        release_name: latest-rc
         prerelease: true
-        replacesArtifacts: true
-        tag: dev
-        token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: onvif_srvd
 
-    # - name: Release (pre-release)
-    #   if: env.isReleaseCandidate == 'true'
-    #   uses: ncipollo/release-action@v1
-    #   with:
-    #     token: ${{ secrets.GITHUB_TOKEN }}
-    #     prerelease: true
-    #     artifacts: onvif_srvd
-        
-    - name: Update latest-rc tag
-      if: env.isReleaseCandidate == 'true'
-      uses: ncipollo/release-action@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        tag: latest-rc
-        allowUpdates: true
-        replacesArtifacts: true
-        prerelease: true
-        artifacts: onvif_srvd
-
-    # - name: Release (final)
-    #   if: env.isFinalRelease == 'true'
-    #   uses: ncipollo/release-action@v1
-    #   with:
-    #     token: ${{ secrets.GITHUB_TOKEN }}
-    #     artifacts: onvif_srvd
-        
-    - name: Update latest tag
+    - name: Create Release
       if: env.isFinalRelease == 'true'
-      uses: ncipollo/release-action@v1
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        tag: latest
-        allowUpdates: true
-        replacesArtifacts: true
-        artifacts: onvif_srvd
+        tag_name: latest
+        release_name: latest
+        prerelease: true
+
+    - name: Upload Release Asset
+      if: env.isNightly == 'true'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release_candidate.outputs.upload_url }}
+        asset_path: ./dist/onvif_srvd
+        asset_name: onvif_srvd
+        asset_content_type: application/zip
+     
+    - name: Upload Release Asset
+      if: env.isFinalRelease == 'true'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/onvif_srvd
+        asset_name: onvif_srvd
+        asset_content_type: application/zip   
