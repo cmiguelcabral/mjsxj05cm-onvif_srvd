@@ -37,6 +37,8 @@ CFLAGS           += -I$(GENERATED_DIR)
 CFLAGS           += -I$(GSOAP_DIR) -I$(GSOAP_CUSTOM_DIR) -I$(GSOAP_PLUGIN_DIR) -I$(GSOAP_IMPORT_DIR)
 CFLAGS           += -std=c++11 -O2  -Wall  -pipe
 
+# CFLAGS           += -L~/coding/output/host/arm-buildroot-linux-uclibcgnueabihf/include/c++/8.4.0
+
 GCC              ?=  arm-linux-gnueabihf-g++
 LDFLAGS          ?=  -static-libstdc++
 
@@ -176,7 +178,7 @@ $(DAEMON_NAME)_$(DEBUG_SUFFIX): .depend $(DEBUG_OBJECTS)
 
 .PHONY: clean
 clean:
-	-@rm -f $(DAEMON_NAME)
+	-@rm -rf dist
 	-@rm -f $(DAEMON_NAME)_$(DEBUG_SUFFIX)
 	-@rm -f $(OBJECTS)
 	-@rm -f $(DEBUG_OBJECTS)
@@ -247,7 +249,8 @@ endef
 
 define build_bin
     @$(BUILD_ECHO)
-    $(GCC)  $1 -o $@  $(CFLAGS) $(LDFLAGS)
+    test -d dist || mkdir dist
+    $(GCC)  $1 -o dist/$@  $(CFLAGS) $(LDFLAGS)
     @echo "\n---- Compiled $@ ver $(DAEMON_MAJOR_VERSION).$(DAEMON_MINOR_VERSION).$(DAEMON_PATCH_VERSION) ----\n"
 endef
 

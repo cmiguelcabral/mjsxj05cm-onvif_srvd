@@ -2,7 +2,9 @@
 #define SERVICECONTEXT_H
 
 
-#include <string.h>
+#include <string>
+#include <vector>	
+#include <map>	
 
 #include "soapH.h"
 #include "eth_dev_param.h"
