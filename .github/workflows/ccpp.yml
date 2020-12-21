@@ -56,7 +56,7 @@ jobs:
       uses: marvinpinto/action-automatic-releases@latest
       if: env.isFinalRelease == 'true'
       with:
-        automatic_release_tag: latest-rc
+        automatic_release_tag: stable
         files: dist/onvif_srvd
         prerelease: false
         repo_token: "${{ secrets.GITHUB_TOKEN }}"

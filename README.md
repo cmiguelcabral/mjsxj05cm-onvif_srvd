@@ -1,4 +1,9 @@
-# ONVIF Device(IP camera) Service server
+stable | latest
+Latest | Stable
+--- | ---
+![C/C++ CI](https://github.com/cmiguelcabral/mjsxj05cm-onvif_srvd/workflows/C/C++%20CI/badge.svg?tag=latest-rc) | ![C/C++ CI](https://github.com/cmiguelcabral/mjsxj05cm-onvif_srvd/workflows/C/C++%20CI/badge.svg?branch=master)
+
+# Mi Camera ONVIF Service server (MJSXJ05CM)
 
 
 ## Description
